@@ -529,6 +529,17 @@ export default function App() {
     return top > 0 ? best : null;
   };
 
+  const getSessionStatus = (session) => {
+    const a = avail[session] || {};
+    const dmStatus = a["DM"];
+    const players = FELLOWSHIP.filter(f => !f.isDM);
+    const yesCount = players.filter(f => a[f.player] === "yes").length;
+    const notAvailCount = players.filter(f => a[f.player] === "no" || a[f.player] === "maybe").length;
+    if (dmStatus === "yes" && yesCount >= 4) return "on";
+    if (dmStatus === "no" || notAvailCount > 1) return "off";
+    return null;
+  };
+
   const isCrit = diceValue === 20;
   const isFail = diceValue === 1;
   const bestSession = getBestSession();
@@ -799,6 +810,30 @@ export default function App() {
     }
     .session-card:hover { border-color:#3a2000; box-shadow:0 6px 30px rgba(0,0,0,0.5); }
     .session-card.best { border-color:#5a3a10; box-shadow:0 0 25px rgba(212,169,58,0.1); }
+    .session-card.status-on  { border-color:#50a832; box-shadow:0 0 30px rgba(80,168,50,0.25); }
+    .session-card.status-off { border-color:#be2020; box-shadow:0 0 30px rgba(190,32,32,0.2); }
+    @keyframes statusPulse { 0%,100%{opacity:1} 50%{opacity:0.75} }
+    .session-status-banner {
+      padding: 11px 18px;
+      text-align: center;
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.05rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      animation: statusPulse 2s ease-in-out infinite;
+    }
+    .session-status-banner.on {
+      background: linear-gradient(135deg, #061a02, #0a2604);
+      color: #6acc44;
+      text-shadow: 0 0 18px rgba(80,200,50,0.8), 0 0 40px rgba(80,200,50,0.4);
+      border-bottom: 1px solid #1a4d0e;
+    }
+    .session-status-banner.off {
+      background: linear-gradient(135deg, #1a0000, #0e0000);
+      color: #e83838;
+      text-shadow: 0 0 16px rgba(220,50,50,0.8), 0 0 35px rgba(220,50,50,0.4);
+      border-bottom: 1px solid #4a0a0a;
+    }
     .session-head { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid #180e00; flex-wrap:wrap; gap:8px; }
     .session-date-col { display:flex; flex-direction:column; gap:2px; }
     .session-date { font-family:'Cinzel',serif; font-size:0.95rem; color:#d4a93a; }
@@ -1134,8 +1169,11 @@ export default function App() {
               const stats = getStats(s);
               const mine = avail[s]?.[currentPlayer];
               const isBest = s === bestSession;
+              const status = getSessionStatus(s);
               return (
-                <div className={`session-card${isBest?" best":""}`} key={s} style={{animationDelay:`${i*0.07}s`}}>
+                <div className={`session-card${isBest?" best":""}${status?" status-"+status:""}`} key={s} style={{animationDelay:`${i*0.07}s`}}>
+                  {status === "on"  && <div className="session-status-banner on">⚔️ IT'S ON! ⚔️</div>}
+                  {status === "off" && <div className="session-status-banner off">💀 GAME OVER 💀</div>}
                   <div className="session-head">
                     <div className="session-date-col">
                       <span className="session-date">{formatDate(s)}</span>
