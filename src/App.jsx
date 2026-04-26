@@ -104,30 +104,65 @@ function Dragon() {
           <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
           <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
+        <style>{`
+          @keyframes dWingFlap {
+            0%   { transform: rotate(0deg);   }
+            28%  { transform: rotate(-24deg);  }
+            65%  { transform: rotate(18deg);   }
+            100% { transform: rotate(0deg);   }
+          }
+          @keyframes dFlameFlicker {
+            0%,100% { opacity:.78; transform: scaleX(1)    scaleY(1);    }
+            20%     { opacity:1;   transform: scaleX(1.13) scaleY(1.09); }
+            50%     { opacity:.58; transform: scaleX(.88)  scaleY(.92);  }
+            75%     { opacity:.92; transform: scaleX(1.10) scaleY(1.06); }
+          }
+          @keyframes dEyePulse {
+            0%,100% { opacity:1;   }
+            50%     { opacity:.35; }
+          }
+          .d-wing-n {
+            transform-origin: 152px 74px;
+            animation: dWingFlap 1.35s cubic-bezier(.37,0,.63,1) infinite;
+          }
+          .d-wing-f {
+            transform-origin: 148px 80px;
+            animation: dWingFlap 1.35s cubic-bezier(.37,0,.63,1) .2s infinite;
+          }
+          .d-flame {
+            transform-origin: 374px 55px;
+            animation: dFlameFlicker .52s ease-in-out infinite;
+          }
+          .d-eye { animation: dEyePulse 2.1s ease-in-out infinite; }
+        `}</style>
       </defs>
 
       {/* ── FAR WING (behind body) ── */}
-      <path d="M148,80 L35,42 L68,78 Z" fill="url(#dWing)" opacity="0.65"/>
-      <line x1="148" y1="80" x2="35" y2="42" stroke="#1a4d0a" strokeWidth="0.8" opacity="0.6"/>
+      <g className="d-wing-f">
+        <path d="M148,80 L35,42 L68,78 Z" fill="url(#dWing)" opacity="0.65"/>
+        <line x1="148" y1="80" x2="35" y2="42" stroke="#1a4d0a" strokeWidth="0.8" opacity="0.6"/>
+      </g>
 
       {/* ── NEAR WING ── */}
-      {/* Wing membrane segments */}
-      <path d="M152,74 L55,8 L80,50 Z" fill="url(#dWing)"/>
-      <path d="M152,74 L80,50 L100,22 Z" fill="url(#dWing)" opacity="0.92"/>
-      <path d="M152,74 L100,22 L125,12 Z" fill="url(#dWing)" opacity="0.88"/>
-      <path d="M152,74 L125,12 L148,28 L138,78 Z" fill="url(#dWing)" opacity="0.82"/>
-      {/* Wing leading edge claw */}
-      <path d="M55,8 Q50,4 47,8 Q52,12 57,10 Z" fill="#1a3a08"/>
-      <path d="M80,50 Q75,46 72,50 Q77,54 82,52 Z" fill="#1a3a08"/>
-      {/* Wing spars (veins) */}
-      <line x1="152" y1="74" x2="55"  y2="8"  stroke="#2d6b12" strokeWidth="1.2"/>
-      <line x1="152" y1="74" x2="80"  y2="50" stroke="#2d6b12" strokeWidth="1.1"/>
-      <line x1="152" y1="74" x2="100" y2="22" stroke="#2d6b12" strokeWidth="1.0"/>
-      <line x1="152" y1="74" x2="125" y2="12" stroke="#2d6b12" strokeWidth="0.9"/>
-      <line x1="152" y1="74" x2="148" y2="28" stroke="#2d6b12" strokeWidth="0.8"/>
-      {/* Membrane texture lines */}
-      <path d="M70,30 Q110,55 148,74" stroke="#1a4d0a" strokeWidth="0.5" fill="none" opacity="0.5"/>
-      <path d="M90,18 Q120,46 148,74" stroke="#1a4d0a" strokeWidth="0.5" fill="none" opacity="0.4"/>
+      <g className="d-wing-n">
+        {/* Wing membrane segments */}
+        <path d="M152,74 L55,8 L80,50 Z" fill="url(#dWing)"/>
+        <path d="M152,74 L80,50 L100,22 Z" fill="url(#dWing)" opacity="0.92"/>
+        <path d="M152,74 L100,22 L125,12 Z" fill="url(#dWing)" opacity="0.88"/>
+        <path d="M152,74 L125,12 L148,28 L138,78 Z" fill="url(#dWing)" opacity="0.82"/>
+        {/* Wing leading edge claw */}
+        <path d="M55,8 Q50,4 47,8 Q52,12 57,10 Z" fill="#1a3a08"/>
+        <path d="M80,50 Q75,46 72,50 Q77,54 82,52 Z" fill="#1a3a08"/>
+        {/* Wing spars (veins) */}
+        <line x1="152" y1="74" x2="55"  y2="8"  stroke="#2d6b12" strokeWidth="1.2"/>
+        <line x1="152" y1="74" x2="80"  y2="50" stroke="#2d6b12" strokeWidth="1.1"/>
+        <line x1="152" y1="74" x2="100" y2="22" stroke="#2d6b12" strokeWidth="1.0"/>
+        <line x1="152" y1="74" x2="125" y2="12" stroke="#2d6b12" strokeWidth="0.9"/>
+        <line x1="152" y1="74" x2="148" y2="28" stroke="#2d6b12" strokeWidth="0.8"/>
+        {/* Membrane texture lines */}
+        <path d="M70,30 Q110,55 148,74" stroke="#1a4d0a" strokeWidth="0.5" fill="none" opacity="0.5"/>
+        <path d="M90,18 Q120,46 148,74" stroke="#1a4d0a" strokeWidth="0.5" fill="none" opacity="0.4"/>
+      </g>
 
       {/* ── TAIL ── */}
       <path d="M82,96 Q55,112 28,100 Q10,90 16,82 Q4,78 10,70 Q-2,65 4,58" stroke="url(#dBodyTop)" strokeWidth="13" fill="none" strokeLinecap="round"/>
@@ -236,20 +271,32 @@ function Dragon() {
       <circle cx="306" cy="43.5" r="1.5" fill="rgba(255,255,200,0.7)"/>
       <circle cx="302.5" cy="49" r="0.7" fill="rgba(255,255,200,0.3)"/>
       {/* Outer glow ring */}
-      <circle cx="304" cy="46" r="10" fill="none" stroke="#ff8800" strokeWidth="0.8" opacity="0.35"/>
+      <circle cx="304" cy="46" r="10" fill="none" stroke="#ff8800" strokeWidth="0.8" opacity="0.35" className="d-eye"/>
 
       {/* ── FLAME ── */}
-      {/* Outer flame body */}
-      <path d="M372,54 Q390,42 410,40 Q422,42 426,50 Q422,60 410,65 Q392,68 376,62 Z" fill="#ff3300" opacity="0.75" filter="url(#flameGlow)"/>
-      {/* Mid flame */}
-      <path d="M374,55 Q390,46 408,44 Q418,47 420,53 Q416,61 406,63 Q390,65 378,60 Z" fill="url(#dFlame)" opacity="0.9"/>
-      {/* Inner flame */}
-      <path d="M376,56 Q390,50 406,49 Q414,52 413,57 Q408,62 396,62 Q384,61 378,58 Z" fill="url(#dFlame2)" opacity="0.85"/>
-      {/* Flame core */}
-      <ellipse cx="395" cy="55" rx="12" ry="5" fill="#ffffff" opacity="0.35"/>
-      {/* Flame wisps */}
-      <path d="M410,40 Q420,32 425,36 Q422,44 416,42 Z" fill="#ff8800" opacity="0.6"/>
-      <path d="M415,44 Q424,37 428,42 Q425,50 420,48 Z" fill="#ffcc00" opacity="0.5"/>
+      <g className="d-flame">
+        <path d="M372,54 Q390,42 410,40 Q422,42 426,50 Q422,60 410,65 Q392,68 376,62 Z" fill="#ff3300" opacity="0.75" filter="url(#flameGlow)"/>
+        <path d="M374,55 Q390,46 408,44 Q418,47 420,53 Q416,61 406,63 Q390,65 378,60 Z" fill="url(#dFlame)" opacity="0.9"/>
+        <path d="M376,56 Q390,50 406,49 Q414,52 413,57 Q408,62 396,62 Q384,61 378,58 Z" fill="url(#dFlame2)" opacity="0.85"/>
+        <ellipse cx="395" cy="55" rx="12" ry="5" fill="#ffffff" opacity="0.35"/>
+        <path d="M410,40 Q420,32 425,36 Q422,44 416,42 Z" fill="#ff8800" opacity="0.6"/>
+        <path d="M415,44 Q424,37 428,42 Q425,50 420,48 Z" fill="#ffcc00" opacity="0.5"/>
+      </g>
+      {/* ── FIRE SPARKS ── */}
+      {[
+        { x:416, y:48, tx:5,  ty:-26, dur:"0.72s", begin:"0s",    r:2.2, color:"#ffee44" },
+        { x:422, y:52, tx:3,  ty:-18, dur:"0.55s", begin:"0.22s", r:1.5, color:"#ffffff" },
+        { x:418, y:43, tx:6,  ty:-30, dur:"0.88s", begin:"0.44s", r:2.5, color:"#ff9900" },
+        { x:424, y:50, tx:2,  ty:-22, dur:"0.63s", begin:"0.65s", r:1.6, color:"#ffcc00" },
+        { x:412, y:46, tx:7,  ty:-20, dur:"0.79s", begin:"0.1s",  r:1.8, color:"#ff6600" },
+      ].map((p, i) => (
+        <circle key={i} cx={p.x} cy={p.y} r={p.r} fill={p.color} opacity="0" filter="url(#flameGlow)">
+          <animate attributeName="cx"      values={`${p.x};${p.x+p.tx}`}       dur={p.dur} begin={p.begin} repeatCount="indefinite"/>
+          <animate attributeName="cy"      values={`${p.y};${p.y+p.ty}`}       dur={p.dur} begin={p.begin} repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0;.95;.7;0" keyTimes="0;.12;.55;1" dur={p.dur} begin={p.begin} repeatCount="indefinite"/>
+          <animate attributeName="r"       values={`${p.r};${p.r*.5};0`}       dur={p.dur} begin={p.begin} repeatCount="indefinite"/>
+        </circle>
+      ))}
     </svg>
   );
 }
