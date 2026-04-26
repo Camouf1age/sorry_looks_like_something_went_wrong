@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 
 const STORAGE_KEY = "dnd_sorry_v1";
 
@@ -474,9 +474,24 @@ function Ornament({ w = 300 }) {
   );
 }
 
+const PUFF_LYRICS = [
+  "🎵 Puff, the magic dragon",
+  "lived by the sea 🌊",
+  "and frolicked in the autumn mist",
+  "in a land called Honah Lee 🎵",
+  "♪ Little Jackie Paper",
+  "loved that rascal Puff ♫",
+  "and brought him strings and sealing wax",
+  "and other fancy stuff 🎶",
+  "🐉 ...puff... 🐉",
+];
+
 // ── DRAGON FLIGHT ──────────────────────────────────────────────────────────
 function DragonFlight() {
   const [topPx, setTopPx] = useState(62);
+  const [lyrics, setLyrics] = useState([]);
+  const singingRef = useRef(false);
+  const timeoutsRef = useRef([]);
 
   useEffect(() => {
     let timeout;
@@ -491,10 +506,42 @@ function DragonFlight() {
     return () => clearTimeout(timeout);
   }, []);
 
+  useEffect(() => () => timeoutsRef.current.forEach(clearTimeout), []);
+
+  const sing = () => {
+    if (singingRef.current) return;
+    singingRef.current = true;
+    PUFF_LYRICS.forEach((text, i) => {
+      const t = setTimeout(() => {
+        const id = Date.now() + i;
+        const left = 10 + Math.random() * 70;
+        setLyrics(prev => [...prev, { id, text, left }]);
+        setTimeout(() => {
+          setLyrics(prev => prev.filter(l => l.id !== id));
+          if (i === PUFF_LYRICS.length - 1) singingRef.current = false;
+        }, 3800);
+      }, i * 1500);
+      timeoutsRef.current.push(t);
+    });
+  };
+
   return (
-    <div className="dragon-track" style={{ top: topPx, transition: "top 3s ease-in-out" }}>
-      <div className="dragon-flyer"><Dragon /></div>
-    </div>
+    <>
+      <div className="dragon-track" style={{ top: topPx, transition: "top 3s ease-in-out" }}>
+        <div className="dragon-flyer" onClick={sing} style={{ cursor: "pointer", pointerEvents: "auto" }}>
+          <Dragon />
+        </div>
+      </div>
+      {lyrics.length > 0 && (
+        <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 205 }}>
+          {lyrics.map(l => (
+            <div key={l.id} className="dragon-lyric" style={{ left: `${l.left}%`, top: topPx + 10 }}>
+              {l.text}
+            </div>
+          ))}
+        </div>
+      )}
+    </>
   );
 }
 
@@ -633,6 +680,24 @@ export default function App() {
       position:absolute; top:0; left:0; transform-origin:center center;
       animation:dragonSweep 26s linear infinite;
       filter: drop-shadow(0 0 18px rgba(255,120,0,0.6)) drop-shadow(0 0 6px rgba(50,150,10,0.4));
+    }
+
+    /* Dragon lyrics */
+    @keyframes lyricFloat {
+      0%   { opacity:0; transform:translateY(0) scale(0.85); }
+      10%  { opacity:1; transform:translateY(-12px) scale(1); }
+      75%  { opacity:1; transform:translateY(-90px); }
+      100% { opacity:0; transform:translateY(-140px) scale(0.9); }
+    }
+    .dragon-lyric {
+      position: absolute;
+      font-family: 'Cinzel', serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #ffe066;
+      text-shadow: 0 0 14px rgba(255,200,0,0.9), 0 0 30px rgba(255,120,0,0.6);
+      white-space: nowrap;
+      animation: lyricFloat 3.8s ease-out forwards;
     }
 
     /* Torches */
