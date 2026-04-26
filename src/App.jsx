@@ -545,6 +545,61 @@ function DragonFlight() {
   );
 }
 
+// ── CROSSBOW ───────────────────────────────────────────────────────────────
+const CURSOR_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect x="13" y="8" width="6" height="20" rx="3" fill="#7a4d1e"/><rect x="14" y="8" width="4" height="18" rx="2" fill="#a06930"/><rect x="11" y="25" width="10" height="3" rx="1.5" fill="#5c3a10"/><path d="M4,16 Q16,10 28,16" stroke="#3a2000" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M4,16 Q16,11 28,16" stroke="#7a5a2a" stroke-width="1.5" fill="none" stroke-linecap="round"/><line x1="4" y1="16" x2="16" y2="18" stroke="#d4c098" stroke-width="1.3"/><line x1="28" y1="16" x2="16" y2="18" stroke="#d4c098" stroke-width="1.3"/><rect x="15" y="5" width="2" height="13" rx="1" fill="#5c3a10"/><polygon points="16,0 13,6 19,6" fill="#c8a030"/><path d="M15,17 Q12,15 13,13" fill="#8b2020"/><path d="M17,17 Q20,15 19,13" fill="#8b2020"/></svg>`;
+
+function CrossbowLayer() {
+  const [bolts, setBolts] = useState([]);
+
+  useEffect(() => {
+    const enc = encodeURIComponent(CURSOR_SVG);
+    document.body.style.cursor = `url("data:image/svg+xml,${enc}") 16 0, crosshair`;
+    return () => { document.body.style.cursor = ""; };
+  }, []);
+
+  useEffect(() => {
+    const fire = (e) => {
+      if (e.target.closest("button, a, input")) return;
+      const id = Date.now() + Math.random();
+      const x = e.clientX;
+      const y = e.clientY;
+      const tx = window.innerWidth * 0.2 + Math.random() * window.innerWidth * 0.6;
+      const ty = 20 + Math.random() * 90;
+      const dx = tx - x;
+      const dy = ty - y;
+      const angle = Math.atan2(dy, dx) * 180 / Math.PI + 90;
+      setBolts(prev => [...prev, { id, x, y, angle }]);
+      setTimeout(() => setBolts(prev => prev.filter(b => b.id !== id)), 650);
+    };
+    document.addEventListener("click", fire);
+    return () => document.removeEventListener("click", fire);
+  }, []);
+
+  return (
+    <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 215 }}>
+      {bolts.map(b => (
+        <div key={b.id} style={{
+          position: "absolute",
+          left: b.x - 4,
+          top: b.y - 11,
+          transform: `rotate(${b.angle}deg)`,
+          transformOrigin: "4px 11px",
+        }}>
+          <div style={{ animation: "boltFly 0.6s ease-in forwards" }}>
+            <svg width="8" height="22" viewBox="0 0 8 22" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="5" width="2" height="13" rx="1" fill="#7a4d1e"/>
+              <polygon points="4,0 2,6 6,6" fill="#c8a030"/>
+              <path d="M3,18 Q1,16 2,14" fill="#8b2020"/>
+              <path d="M5,18 Q7,16 6,14" fill="#8b2020"/>
+              <rect x="3.5" y="18" width="1" height="4" fill="#5c3a10"/>
+            </svg>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ── APP ────────────────────────────────────────────────────────────────────
 export default function App() {
   const [avail, setAvail] = useState({});
@@ -698,6 +753,12 @@ export default function App() {
       text-shadow: 0 0 14px rgba(255,200,0,0.9), 0 0 30px rgba(255,120,0,0.6);
       white-space: nowrap;
       animation: lyricFloat 3.8s ease-out forwards;
+    }
+
+    /* Crossbow bolts */
+    @keyframes boltFly {
+      from { transform: translateY(0);      opacity: 1; }
+      to   { transform: translateY(-650px); opacity: 0; }
     }
 
     /* Torches */
@@ -1204,6 +1265,7 @@ export default function App() {
     <div className={`app${shaking ? " shaking" : ""}`}>
       <style>{css}</style>
       {activeEffect && <EffectOverlay player={activeEffect} />}
+      <CrossbowLayer />
       <Embers />
       <div className="torch torch-tl">🔥</div>
       <div className="torch torch-tr">🔥</div>
