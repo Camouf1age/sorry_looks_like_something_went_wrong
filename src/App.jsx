@@ -134,6 +134,16 @@ function Dragon() {
             animation: dFlameFlicker .52s ease-in-out infinite;
           }
           .d-eye { animation: dEyePulse 2.1s ease-in-out infinite; }
+          @keyframes dTailWag {
+            0%,100% { transform: rotate(0deg);   }
+            25%     { transform: rotate(-11deg);  }
+            60%     { transform: rotate(9deg);    }
+            80%     { transform: rotate(-5deg);   }
+          }
+          .d-tail {
+            transform-origin: 82px 96px;
+            animation: dTailWag 2.6s ease-in-out infinite;
+          }
         `}</style>
       </defs>
 
@@ -165,15 +175,17 @@ function Dragon() {
       </g>
 
       {/* ── TAIL ── */}
-      <path d="M82,96 Q55,112 28,100 Q10,90 16,82 Q4,78 10,70 Q-2,65 4,58" stroke="url(#dBodyTop)" strokeWidth="13" fill="none" strokeLinecap="round"/>
-      <path d="M82,96 Q55,112 28,100 Q12,92 16,84" stroke="url(#dBelly)" strokeWidth="5" fill="none" strokeLinecap="round" opacity="0.5"/>
-      {/* Tail tip */}
-      <path d="M4,58 Q-4,52 0,46 Q10,52 7,62 Z" fill="#1a4d0a"/>
-      <path d="M4,58 Q-4,52 0,46 Q10,52 7,62 Z" fill="#2d6b12" opacity="0.5"/>
-      {/* Tail spine ridges */}
-      <path d="M68,102 Q65,91 70,94" stroke="#3a9a1e" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
-      <path d="M52,108 Q49,97 54,100" stroke="#3a9a1e" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
-      <path d="M36,106 Q33,96 38,98" stroke="#3a9a1e" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
+      <g className="d-tail">
+        <path d="M82,96 Q55,112 28,100 Q10,90 16,82 Q4,78 10,70 Q-2,65 4,58" stroke="url(#dBodyTop)" strokeWidth="13" fill="none" strokeLinecap="round"/>
+        <path d="M82,96 Q55,112 28,100 Q12,92 16,84" stroke="url(#dBelly)" strokeWidth="5" fill="none" strokeLinecap="round" opacity="0.5"/>
+        {/* Tail tip */}
+        <path d="M4,58 Q-4,52 0,46 Q10,52 7,62 Z" fill="#1a4d0a"/>
+        <path d="M4,58 Q-4,52 0,46 Q10,52 7,62 Z" fill="#2d6b12" opacity="0.5"/>
+        {/* Tail spine ridges */}
+        <path d="M68,102 Q65,91 70,94" stroke="#3a9a1e" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+        <path d="M52,108 Q49,97 54,100" stroke="#3a9a1e" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
+        <path d="M36,106 Q33,96 38,98" stroke="#3a9a1e" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
+      </g>
 
       {/* ── MAIN BODY ── */}
       <ellipse cx="155" cy="92" rx="76" ry="32" fill="url(#dBodyTop)"/>
@@ -459,6 +471,30 @@ function Ornament({ w = 300 }) {
       <polygon points={`${w*0.58},10 ${w*0.60},6 ${w*0.62},10 ${w*0.60},14`} fill="#6a4010" opacity="0.8"/>
       <line x1={w*0.65} y1="10" x2={w} y2="10" stroke="#3a2200" strokeWidth="1"/>
     </svg>
+  );
+}
+
+// ── DRAGON FLIGHT ──────────────────────────────────────────────────────────
+function DragonFlight() {
+  const [topPx, setTopPx] = useState(62);
+
+  useEffect(() => {
+    let timeout;
+    const schedule = () => {
+      const delay = 11000 + Math.random() * 5000;
+      timeout = setTimeout(() => {
+        setTopPx(20 + Math.floor(Math.random() * 110));
+        schedule();
+      }, delay);
+    };
+    schedule();
+    return () => clearTimeout(timeout);
+  }, []);
+
+  return (
+    <div className="dragon-track" style={{ top: topPx, transition: "top 3s ease-in-out" }}>
+      <div className="dragon-flyer"><Dragon /></div>
+    </div>
   );
 }
 
@@ -1107,9 +1143,7 @@ export default function App() {
       <div className="torch torch-tl">🔥</div>
       <div className="torch torch-tr">🔥</div>
 
-      <div className="dragon-track">
-        <div className="dragon-flyer"><Dragon /></div>
-      </div>
+      <DragonFlight />
 
       <header className="header">
         <div className="header-inner">
